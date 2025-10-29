@@ -1,0 +1,20 @@
+FROM dhi.io/debian-base:trixie
+
+RUN apt-get update \
+ && apt-get --no-install-recommends --no-install-suggests -y install \
+      aria2 \
+      ca-certificates \
+      curl \
+      iperf \
+      iperf3 \
+      iproute2 \
+      iputils-ping \
+      jq \
+      nftables \
+      procps \
+      tcpdump \
+      vim
+
+COPY --parents usr/bin /
+
+WORKDIR /root
