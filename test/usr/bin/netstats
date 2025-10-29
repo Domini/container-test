@@ -1,0 +1,34 @@
+#!/bin/bash -e
+IF=$1
+WINDOW=${2-1}
+RX_PACKETS_FILE=/sys/class/net/$IF/statistics/rx_packets
+TX_PACKETS_FILE=/sys/class/net/$IF/statistics/tx_packets
+RX_BYTES_FILE=/sys/class/net/$IF/statistics/rx_bytes
+TX_BYTES_FILE=/sys/class/net/$IF/statistics/tx_bytes
+DIV=$((WINDOW*(1000/8)))
+IFS= read -r RX_PACKETS <"$RX_PACKETS_FILE"
+IFS= read -r TX_PACKETS <"$TX_PACKETS_FILE"
+IFS= read -r RX_BYTES <"$RX_BYTES_FILE"
+IFS= read -r TX_BYTES <"$TX_BYTES_FILE"
+while true; do
+    sleep "$WINDOW"
+    RX_PACKETS_PREV=$RX_PACKETS
+    TX_PACKETS_PREV=$TX_PACKETS
+    RX_BYTES_PREV=$RX_BYTES
+    TX_BYTES_PREV=$TX_BYTES
+    # shellcheck disable=SC3028
+    NOW=$EPOCHREALTIME
+    IFS= read -r RX_PACKETS <"$RX_PACKETS_FILE"
+    IFS= read -r TX_PACKETS <"$TX_PACKETS_FILE"
+    IFS= read -r RX_BYTES <"$RX_BYTES_FILE"
+    IFS= read -r TX_BYTES <"$TX_BYTES_FILE"
+    SEC=${NOW%[,.]*}
+    MSEC=${NOW#*[,.]}
+    RX_KBPS=$(((RX_BYTES-RX_BYTES_PREV)/DIV))
+    TX_KBPS=$(((TX_BYTES-TX_BYTES_PREV)/DIV))
+    printf '%(%Y-%m-%d %H:%M:%S)T.%6s Received: %7d pps %4d.%03d Mbps\tSent: %7d pps %4d.%03d Mbps\n' "$SEC" "$MSEC" \
+                                                $(((RX_PACKETS-RX_PACKETS_PREV)/WINDOW)) \
+                                                        $((RX_KBPS/1000)) $((RX_KBPS%1000)) \
+                                                                             $(((TX_PACKETS-TX_PACKETS_PREV)/WINDOW)) \
+                                                                                     $((TX_KBPS/1000)) $((TX_KBPS%1000))
+done
