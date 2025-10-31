@@ -1,0 +1,9 @@
+[Container]
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+AutoUpdate=registry
+ContainerName=test-%i
+Entrypoint=[ "/bin/sh" ]
+Exec=-e -c "trap 'exit 0' TERM; while :; do :; done & kill -STOP $!; wait $!"
+Image=ghcr.io/domini/test:latest
+Pull=newer
