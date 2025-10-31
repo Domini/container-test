@@ -1,0 +1,6 @@
+[Container]
+AddCapability=NET_ADMIN
+AddCapability=NET_RAW
+ContainerName=test-%i
+Image=ghcr.io/domini/test:latest
+Pull=newer
