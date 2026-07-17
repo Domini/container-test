@@ -50,7 +50,6 @@ jobs:
         context: ./${{ env.PACKAGE_NAME }}
         file: ./${{ env.PACKAGE_NAME }}/Containerfile
         cache-from: type=gha
-        cache-to: type=gha,mode=max
         labels: ${{ steps.meta.outputs.labels }}
         tags: ${{ env.REGISTRY_IMAGE }}
         outputs: type=image,push-by-digest=true,name-canonical=true,push=true
